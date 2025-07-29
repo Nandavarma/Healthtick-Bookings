@@ -49,7 +49,7 @@ Before you begin, ensure you have the following installed:
 
 3. **Set up environment variables**
    
-   This is not required, as for assignment purposes I have setup the project directly without using any environment variables.
+   ### (🔴)This is not required, as for assignment purposes I have setup the project directly without using any environment variables. Usually we don't do this in production.(🔴)
 
 4. **Run the development server**
    ```bash
@@ -60,19 +60,12 @@ Before you begin, ensure you have the following installed:
    
    Navigate to `http://localhost:5173` (or the port shown in your terminal)
 
-`
-## 🔧 Available Scripts
-
-- `npm run dev` - Runs the app in development mode
-- `npm run build` - Builds the app for production
-- `npm run preview` - Preview the production build locally
-- `npm run lint` - Run ESLint to check code quality
 
 ## Assignment Context
 - I've implemented everything with clear logic.
 - I've used AI-tools for minimal logic and component generation with clear understanding of code and concept.
 - I used MaterialUI only in some parts as they cannot be implemented with pure tailwindcss.
-- Thanks for the oppurtunity
+- I maintained file structure similar to industry standard applications. (Also suitable for scalable applications)
 
 ## Author
 
