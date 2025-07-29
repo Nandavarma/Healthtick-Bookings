@@ -24,7 +24,8 @@ export const generateDailySlots = (selectedDate: Date, bookings: Booking[]) => {
         start: new Date(overlapping.start),
         isBooked: true,
         duration: overlapping.duration,
-        clientName: overlapping.clientName,
+        clientName: overlapping.ClientName,
+        phoneNumber: overlapping.phoneNumber,
         callType: overlapping.callType,
       });
       current = new Date(

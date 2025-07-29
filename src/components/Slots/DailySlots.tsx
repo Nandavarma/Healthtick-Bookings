@@ -1,15 +1,40 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import SlotModal from "./SlotModal";
-import type { Booking } from "../../definitions/types";
+import type { Booking, Client } from "../../definitions/types";
 import { generateDailySlots } from "../../utils/generateSlots";
+import { getBookings } from "../../firebase/firestore";
 
 export default function DailySlots({ selectedDate }: { selectedDate: Date }) {
-  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [bookings, setBookings] = useState<
+    (Booking & { id: string; client: Client })[]
+  >([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [activeSlot, setActiveSlot] = useState<Date | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const slots = generateDailySlots(new Date(selectedDate), bookings);
+  const loadBookings = async () => {
+    try {
+      setLoading(true);
+      const fetchedBookings = await getBookings();
+      setBookings(fetchedBookings);
+    } catch (error) {
+      console.error("Error loading bookings:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadBookings();
+  }, [selectedDate]);
+
+  const dailyBookings = bookings.filter((booking) => {
+    const bookingDate = new Date(booking.start);
+    return bookingDate.toDateString() === selectedDate.toDateString();
+  });
+
+  const slots = generateDailySlots(new Date(selectedDate), dailyBookings);
 
   const handleSlotClick = (slot: Date) => {
     setActiveSlot(slot);
@@ -22,50 +47,62 @@ export default function DailySlots({ selectedDate }: { selectedDate: Date }) {
   };
 
   const getBooking = (start: Date) =>
-    bookings.find((b) => b.start.getTime() === start.getTime());
+    dailyBookings.find((b) => b.start.getTime() === start.getTime());
 
   return (
-    <div className="mt-6">
-      <h2 className="text-lg text-gray-200 font-semibold mb-4">
-        Slots for {selectedDate.toDateString()}
-      </h2>
+    <div className="min-h-screen bg-slate-900 p-6">
+      <div className="max-w-4xl mx-auto">
+        <h2 className="text-2xl font-bold text-white mb-6 text-center">
+          Slots for {format(selectedDate, "MMMM d, yyyy")}
+        </h2>
 
-      <div className="flex flex-col gap-2">
-        {slots.map((slot, index) => {
-          const booking = slot.isBooked;
-          return (
-            <div
-              key={index}
-              className="flex justify-between items-center bg-white rounded-xl shadow p-4 border border-gray-200"
-            >
-              <span className="text-gray-700 text-sm">
-                {format(slot.start, "hh:mm a")}
-              </span>
-              <button
-                className={`px-3 py-1 rounded-md text-sm font-medium transition ${
-                  booking
-                    ? "bg-blue-600 text-white hover:bg-blue-700"
-                    : "bg-green-600 text-white hover:bg-green-700"
-                }`}
-                onClick={() => handleSlotClick(slot.start)}
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <div className="text-gray-300">Loading slots...</div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {slots.map((slot, index) => (
+              <div
+                key={index}
+                className="flex justify-between items-center bg-slate-800 rounded-xl p-4 border border-slate-700"
               >
-                {booking ? "Booked" : "Available"}
-              </button>
-            </div>
-          );
-        })}
-      </div>
+                <div>
+                  <span className="text-white font-medium">
+                    {format(slot.start, "hh:mm a")}
+                  </span>
+                  {slot.isBooked && slot.clientName && (
+                    <div className="text-sm text-gray-400">
+                      {slot.clientName} • {slot.callType}
+                    </div>
+                  )}
+                </div>
+                <button
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    slot.isBooked
+                      ? "bg-[#F38C79] text-slate-900"
+                      : "bg-slate-700 text-white hover:bg-slate-600"
+                  }`}
+                  onClick={() => handleSlotClick(slot.start)}
+                >
+                  {slot.isBooked ? "Booked" : "Available"}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
 
-      {activeSlot && (
-        <SlotModal
-          open={modalOpen}
-          onClose={handleCloseModal}
-          slotTime={activeSlot}
-          booking={getBooking(activeSlot)}
-          bookings={bookings}
-          setBookings={setBookings}
-        />
-      )}
+        {activeSlot && (
+          <SlotModal
+            open={modalOpen}
+            onClose={handleCloseModal}
+            slotTime={activeSlot}
+            booking={getBooking(activeSlot)}
+            onBookingChange={loadBookings}
+            allBookings={bookings}
+          />
+        )}
+      </div>
     </div>
   );
 }

@@ -1,19 +1,19 @@
+import type { DocumentReference } from "firebase/firestore";
+
 export type CallType = "onboarding" | "follow-up";
 
 export interface Booking {
   start: Date;
   duration: number;
-  clientName: string;
-  isBooked: boolean;
   callType: CallType;
+  clientRef?: DocumentReference;
+  isRecurring?: boolean;
+  recurrenceId?: string;
+  ClientName: string;
+  phoneNumber: string;
 }
 
 export interface Client {
   name: string;
   phoneNumber: string;
 }
-// export interface Slot {
-//   start: Date;
-//   isBooked: boolean;
-//   booking?: Booking;
-// }
