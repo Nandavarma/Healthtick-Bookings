@@ -1,12 +1,12 @@
 import { initializeApp } from "firebase/app";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDdWcO4W7hxSywMzwNq4teDSur0O1YDbKE",
-  authDomain: "healthtick-bookings.firebaseapp.com",
-  projectId: "healthtick-bookings",
-  storageBucket: "healthtick-bookings.firebasestorage.app",
-  messagingSenderId: "298611731133",
-  appId: "1:298611731133:web:cb7d1afb0c3887e622e5d4",
+  apiKey: import.meta.env.VITE_apiKey,
+  authDomain: import.meta.env.VITE_authDomain,
+  projectId: import.meta.env.VITE_projectId,
+  storageBucket: import.meta.env.VITE_storageBucket,
+  messagingSenderId: import.meta.env.VITE_messagingSenderId,
+  appId: import.meta.env.VITE_appId,
 };
 
 export const app = initializeApp(firebaseConfig);
